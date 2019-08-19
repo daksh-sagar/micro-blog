@@ -31,8 +31,14 @@ exports.login = async (req, res) => {
       id: user.id,
       username: user.username
     }
-    res.send(user)
+    await req.session.save()
+    res.redirect('/')
   } catch (error) {
     res.send(error.message)
   }
+}
+
+exports.logout = async (req, res) => {
+  await req.session.destroy()
+  res.redirect('/')
 }
