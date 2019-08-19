@@ -1,10 +1,21 @@
 const User = require('../models/User')
 
+const formatValidationErrors = error => {
+  const errors = []
+  Object.keys(error.errors).forEach(key => {
+    errors.push(error.errors[key].message)
+  })
+  return errors
+}
+
 exports.home = (req, res) => {
   if (req.session.user) {
     res.render('home-dashboard', { username: req.session.user.username })
   } else {
-    res.render('home-guest')
+    res.render('home-guest', {
+      errors: req.flash('errors'),
+      regErrors: req.flash('regErrors')
+    })
   }
 }
 
@@ -19,7 +30,16 @@ exports.register = async (req, res) => {
 
     res.send(user)
   } catch (error) {
-    res.send(error.message)
+    if (error.name === 'ValidationError') {
+      const errors = formatValidationErrors(error)
+      errors.forEach(err => {
+        req.flash('regErrors', err)
+      })
+      await req.session.save()
+      return res.redirect('/')
+    }
+
+    res.status(500).send('Something went very wrong !')
   }
 }
 
@@ -34,7 +54,9 @@ exports.login = async (req, res) => {
     await req.session.save()
     res.redirect('/')
   } catch (error) {
-    res.send(error.message)
+    req.flash('errors', error.message)
+    await req.session.save()
+    res.redirect('/')
   }
 }
 
