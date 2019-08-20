@@ -62,6 +62,10 @@
     <div class="container py-md-5">
       <% errors.forEach((message) => { %>
       <div class="alert alert-danger text-center"><%= message %></div>
+      <% }) %> <% regSuccess.forEach((message) => { %>
+      <div class="alert alert-success text-center"><%= message %></div>
+      <% }) %> <% emailConfirmed.forEach((message) => { %>
+      <div class="alert alert-success text-center"><%= message %></div>
       <% }) %>
 
       <div class="row align-items-center">

@@ -40,6 +40,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [8, 'Password must contain atleast 8 characters']
+  },
+  isConfirmed: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -55,6 +59,9 @@ userSchema.statics.findUserByCredentials = async (email, password) => {
   const user = await mongoose.models.User.findOne({ email })
   if (!user) {
     throw new Error('No user found with the Email')
+  }
+  if (!user.isConfirmed) {
+    throw new Error('You need to confirm your Email address to login')
   }
   const isMatch = await argon2.verify(user.password, password)
   if (!isMatch) {

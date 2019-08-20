@@ -6,7 +6,11 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 mongoose
-  .connect(process.env.DB_URI, { useNewUrlParser: true, useCreateIndex: true })
+  .connect(process.env.DB_URI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useFindAndModify: false
+  })
   .then(() => {
     const app = require('./app')
     app.listen(process.env.PORT)

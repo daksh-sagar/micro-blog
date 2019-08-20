@@ -1,4 +1,6 @@
+const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const sendEmail = require('./utils/sendEmail')
 
 const formatValidationErrors = error => {
   const errors = []
@@ -8,11 +10,21 @@ const formatValidationErrors = error => {
   return errors
 }
 
+const generateConfirmationLink = userId => {
+  const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: '12h'
+  })
+
+  return `http://localhost:5000/confirm-email/${userId}/${token}`
+}
+
 exports.home = (req, res) => {
   if (req.session.user) {
     res.render('home-dashboard', { username: req.session.user.username })
   } else {
     res.render('home-guest', {
+      regSuccess: req.flash('regSuccess'),
+      emailConfirmed: req.flash('emailConfirmed'),
       errors: req.flash('errors'),
       regErrors: req.flash('regErrors')
     })
@@ -28,7 +40,19 @@ exports.register = async (req, res) => {
       password
     })
 
-    res.send(user)
+    const confirmationLink = generateConfirmationLink(user.id)
+
+    await sendEmail({
+      email: user.email,
+      subject: 'Confirm your Email address',
+      message: `Click on this link to activate your email address ${confirmationLink}`
+    })
+    req.flash(
+      'regSuccess',
+      'Please check your inbox for confirmation Email. Click the link in the email to confirm your Email address'
+    )
+    await req.session.save()
+    res.redirect('/')
   } catch (error) {
     if (error.name === 'ValidationError') {
       const errors = formatValidationErrors(error)
@@ -39,7 +63,7 @@ exports.register = async (req, res) => {
       return res.redirect('/')
     }
 
-    res.status(500).send('Something went very wrong !')
+    res.status(500).send(error.message)
   }
 }
 
@@ -63,4 +87,27 @@ exports.login = async (req, res) => {
 exports.logout = async (req, res) => {
   await req.session.destroy()
   res.redirect('/')
+}
+
+exports.confirmEmail = async (req, res) => {
+  const { userId, token } = req.params
+  try {
+    if (!userId || !token) {
+      throw new Error('The link is not valid')
+    }
+
+    const decoded = await jwt.verify(token, process.env.JWT_SECRET)
+    if (decoded.userId === userId) {
+      await User.findByIdAndUpdate(userId, { isConfirmed: true })
+    }
+
+    req.flash(
+      'emailConfirmed',
+      'Your Email has been verified. You can now login'
+    )
+    await req.session.save()
+    res.redirect('/')
+  } catch (error) {
+    res.status(400).send(error.message)
+  }
 }
