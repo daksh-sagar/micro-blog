@@ -111,3 +111,13 @@ exports.confirmEmail = async (req, res) => {
     res.status(400).send(error.message)
   }
 }
+
+exports.requireLogin = async (req, res, next) => {
+  if (req.session.user) {
+    next()
+  } else {
+    req.flash('errors', 'You must be logged in to perform that action')
+    await req.session.save()
+    res.redirect('/')
+  }
+}
