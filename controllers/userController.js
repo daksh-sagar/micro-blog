@@ -1,14 +1,8 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
-const sendEmail = require('./utils/sendEmail')
+const sendEmail = require('../utils/sendEmail')
 
-const formatValidationErrors = error => {
-  const errors = []
-  Object.keys(error.errors).forEach(key => {
-    errors.push(error.errors[key].message)
-  })
-  return errors
-}
+const { formatValidationErrors } = require('../utils/index')
 
 const generateConfirmationLink = userId => {
   const token = jwt.sign({ userId }, process.env.JWT_SECRET, {

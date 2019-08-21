@@ -10,14 +10,17 @@ const {
   logout,
   confirmEmail
 } = userController
-const { viewCreateScreen } = postController
+const { viewCreateScreen, create } = postController
 
+// user related routes
 router.get('/', home)
 router.post('/register', register)
 router.post('/login', login)
 router.post('/logout', logout)
 router.get('/confirm-email/:userId/:token', confirmEmail)
 
+// post related routes
 router.get('/create-post', requireLogin, viewCreateScreen)
+router.post('/create-post', requireLogin, create)
 
 module.exports = router

@@ -1,13 +1,16 @@
 <%- include('includes/header.ejs') %>
 
 <div class="container py-md-5 container--narrow">
-  <form action="#" method="POST">
+  <% postFormErrors.forEach((message) => { %>
+  <div class="alert alert-danger text-center"><%= message %></div>
+  <% }) %>
+
+  <form action="/create-post" method="POST">
     <div class="form-group">
       <label for="post-title" class="text-muted mb-1"
         ><small>Title</small></label
       >
       <input
-        required
         name="title"
         id="post-title"
         class="form-control form-control-lg form-control-title"
@@ -22,7 +25,6 @@
         ><small>Body Content</small></label
       >
       <textarea
-        required
         name="body"
         id="post-body"
         class="body-content tall-textarea form-control"
