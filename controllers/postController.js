@@ -16,7 +16,7 @@ exports.create = async (req, res) => {
       author: req.session.user.id
     })
 
-    res.send(post)
+    res.redirect(`/post/${post.id}`)
   } catch (error) {
     if (error.name === 'ValidationError') {
       const errors = formatValidationErrors(error)
@@ -28,5 +28,16 @@ exports.create = async (req, res) => {
     }
 
     res.status(500).send(error.message)
+  }
+}
+
+exports.showSinglePost = async (req, res) => {
+  const { postId } = req.params
+
+  try {
+    const post = await Post.findSinglePostById(postId)
+    res.render('post', { post })
+  } catch (error) {
+    res.status(404).render('404')
   }
 }

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const { isMongoId } = require('validator')
 
 const postSchema = new mongoose.Schema({
   title: {
@@ -20,6 +21,22 @@ const postSchema = new mongoose.Schema({
     ref: 'User'
   }
 })
+
+postSchema.statics.findSinglePostById = async function(postId) {
+  if (!isMongoId(postId)) {
+    throw new Error('Post not found ')
+  }
+
+  const post = await mongoose.models.Post.findById(postId).populate({
+    path: 'author',
+    select: 'username'
+  })
+  if (!post) {
+    throw new Error('Post not found ')
+  }
+
+  return post
+}
 
 const Post = mongoose.model('Post', postSchema)
 
