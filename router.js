@@ -11,7 +11,13 @@ const {
   confirmEmail,
   showUserProfile
 } = userController
-const { viewCreateScreen, create, showSinglePost } = postController
+const {
+  showCreateScreen,
+  create,
+  showSinglePost,
+  showEditScreen,
+  edit
+} = postController
 
 // user related routes
 router.get('/', home)
@@ -24,8 +30,10 @@ router.get('/confirm-email/:userId/:token', confirmEmail)
 router.get('/profile/:username', showUserProfile)
 
 // post related routes
-router.get('/create-post', requireLogin, viewCreateScreen)
+router.get('/create-post', requireLogin, showCreateScreen)
 router.post('/create-post', requireLogin, create)
+router.get('/post/:postId/edit', requireLogin, showEditScreen)
+router.post('/post/:postId/edit', requireLogin, edit)
 router.get('/post/:postId', showSinglePost)
 
 module.exports = router

@@ -1,7 +1,7 @@
 const Post = require('../models/Post')
 const { formatValidationErrors } = require('../utils/index')
 
-exports.viewCreateScreen = (req, res) => {
+exports.showCreateScreen = (req, res) => {
   res.render('create-post', {
     postFormErrors: req.flash('postFormErrors')
   })
@@ -39,5 +39,59 @@ exports.showSinglePost = async (req, res) => {
     res.render('post', { post })
   } catch (error) {
     res.status(404).render('404')
+  }
+}
+
+exports.showEditScreen = async (req, res) => {
+  const { postId } = req.params
+
+  try {
+    const post = await Post.findSinglePostById(postId)
+
+    // check for permissions
+    if (post.author.id !== req.session.user.id) {
+      // req.flash('errors', 'You do not have permissions to perform that action')
+      // await req.session.save()
+      return res.redirect(`/post/${postId}`)
+    }
+
+    res.render('edit-post', {
+      post,
+      postFormErrors: req.flash('postFormErrors')
+    })
+  } catch (error) {
+    res.status(404).render('404')
+  }
+}
+
+exports.edit = async (req, res) => {
+  const { postId } = req.params
+  const { title, body } = req.body
+  try {
+    const post = await Post.findSinglePostById(postId)
+
+    // check for permissions
+    if (post.author.id !== req.session.user.id) {
+      req.flash('errors', 'You do not have permissions to perform that action')
+      await req.session.save()
+      return res.redirect('/')
+    }
+
+    // Otherwise update the post.
+    post.title = title
+    post.body = body
+    await post.save()
+    res.redirect(`/post/${post.id}`)
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      const errors = formatValidationErrors(error)
+      errors.forEach(err => {
+        req.flash('postFormErrors', err)
+      })
+      await req.session.save()
+      return res.redirect(`/post/${postId}/edit`)
+    }
+
+    res.status(500).send(error.message)
   }
 }
