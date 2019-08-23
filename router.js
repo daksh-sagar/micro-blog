@@ -8,7 +8,8 @@ const {
   login,
   requireLogin,
   logout,
-  confirmEmail
+  confirmEmail,
+  showUserProfile
 } = userController
 const { viewCreateScreen, create, showSinglePost } = postController
 
@@ -18,6 +19,9 @@ router.post('/register', register)
 router.post('/login', login)
 router.post('/logout', logout)
 router.get('/confirm-email/:userId/:token', confirmEmail)
+
+// profile related routes
+router.get('/profile/:username', showUserProfile)
 
 // post related routes
 router.get('/create-post', requireLogin, viewCreateScreen)

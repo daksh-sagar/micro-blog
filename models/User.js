@@ -70,6 +70,16 @@ userSchema.statics.findUserByCredentials = async (email, password) => {
   return user
 }
 
+userSchema.statics.findUserByUsername = async username => {
+  const user = await mongoose.models.User.findOne({ username })
+
+  if (!user) {
+    throw new Error('No user found with given username')
+  }
+
+  return user
+}
+
 // userSchema.path('email').validate(async value => {
 //   const emailCount = await mongoose.models.User.countDocuments({ email: value })
 //   return !emailCount

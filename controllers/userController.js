@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
+const Post = require('../models/Post')
 const sendEmail = require('../utils/sendEmail')
 
 const { formatValidationErrors } = require('../utils/index')
@@ -113,5 +114,18 @@ exports.requireLogin = async (req, res, next) => {
     req.flash('errors', 'You must be logged in to perform that action')
     await req.session.save()
     res.redirect('/')
+  }
+}
+
+exports.showUserProfile = async (req, res) => {
+  try {
+    const user = await User.findUserByUsername(req.params.username)
+    const posts = await Post.find({ author: user.id }).sort({ createdDate: -1 })
+    res.render('profile', {
+      profileUsername: user.username,
+      posts
+    })
+  } catch (error) {
+    res.render(404)
   }
 }
