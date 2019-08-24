@@ -16,7 +16,8 @@ const {
   create,
   showSinglePost,
   showEditScreen,
-  edit
+  edit,
+  deletePost
 } = postController
 
 // user related routes
@@ -33,7 +34,8 @@ router.get('/profile/:username', showUserProfile)
 router.get('/create-post', requireLogin, showCreateScreen)
 router.post('/create-post', requireLogin, create)
 router.get('/post/:postId/edit', requireLogin, showEditScreen)
-router.post('/post/:postId/edit', requireLogin, edit)
 router.get('/post/:postId', showSinglePost)
+router.post('/post/:postId/edit', requireLogin, edit)
+router.post('/post/:postId/delete', requireLogin, deletePost)
 
 module.exports = router

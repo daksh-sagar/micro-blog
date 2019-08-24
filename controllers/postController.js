@@ -95,3 +95,22 @@ exports.edit = async (req, res) => {
     res.status(500).send(error.message)
   }
 }
+
+exports.deletePost = async (req, res) => {
+  const { postId } = req.params
+  try {
+    const post = await Post.findSinglePostById(postId)
+
+    // check for permissions
+    if (post.author.id !== req.session.user.id) {
+      req.flash('errors', 'You do not have permissions to perform that action')
+      await req.session.save()
+      return res.redirect('/')
+    }
+
+    await post.delete()
+    res.redirect(`/profile/${req.session.user.username}`)
+  } catch (error) {
+    res.status(500).send(error.message)
+  }
+}
