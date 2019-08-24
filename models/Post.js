@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 const { isMongoId } = require('validator')
+const sanitizeHTML = require('sanitize-html')
 
 const postSchema = new mongoose.Schema({
   title: {
@@ -20,6 +21,19 @@ const postSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }
+})
+
+postSchema.pre('save', function(next) {
+  const post = this
+  post.title = sanitizeHTML(post.title, {
+    allowedTags: [],
+    allowedAttributes: {}
+  })
+  post.body = sanitizeHTML(post.body, {
+    allowedTags: [],
+    allowedAttributes: {}
+  })
+  next()
 })
 
 postSchema.statics.findSinglePostById = async function(postId) {

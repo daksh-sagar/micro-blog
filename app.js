@@ -3,6 +3,7 @@ const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 const mongoose = require('mongoose')
 const flash = require('connect-flash')
+const markdown = require('marked')
 
 const router = require('./router')
 
@@ -22,6 +23,11 @@ app.use(
 )
 app.use(flash())
 app.use((req, res, next) => {
+  // make markdown func. available inside templates
+  res.locals.filterUserHTML = content => {
+    return markdown(content) // returns parsed markdown as HTML
+  }
+
   res.locals.user = req.session.user
   next()
 })

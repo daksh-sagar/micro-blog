@@ -22,9 +22,11 @@
     "express-session": "^1.16.2",
     "helmet": "^3.20.0",
     "jsonwebtoken": "^8.5.1",
+    "marked": "^0.7.0",
     "mongodb": "^3.3.0",
     "mongoose": "^5.6.9",
     "nodemailer": "^6.3.0",
+    "sanitize-html": "^1.20.1",
     "validator": "^11.1.0"
   },
   "devDependencies": {

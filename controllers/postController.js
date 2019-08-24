@@ -77,7 +77,7 @@ exports.edit = async (req, res) => {
       return res.redirect('/')
     }
 
-    // Otherwise update the post.
+    // Otherwise update the post. (explicit update is done to run pre save middleware)
     post.title = title
     post.body = body
     await post.save()
