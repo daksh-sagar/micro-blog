@@ -114,3 +114,17 @@ exports.deletePost = async (req, res) => {
     res.status(500).send(error.message)
   }
 }
+
+exports.search = async (req, res) => {
+  const { searchTerm } = req.body
+
+  try {
+    const results = await Post.aggregate([
+      { $match: { $text: { $search: searchTerm } } },
+      { $sort: { score: { $meta: 'textScore' } } }
+    ])
+    return res.status(200).json(results)
+  } catch (error) {
+    res.status(500).send('Something went wrong')
+  }
+}

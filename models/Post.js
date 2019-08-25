@@ -52,6 +52,19 @@ postSchema.statics.findSinglePostById = async function(postId) {
   return post
 }
 
+postSchema.index(
+  {
+    title: 'text',
+    body: 'text'
+  },
+  {
+    weights: {
+      title: 2,
+      body: 1
+    }
+  }
+)
+
 const Post = mongoose.model('Post', postSchema)
 
 module.exports = Post

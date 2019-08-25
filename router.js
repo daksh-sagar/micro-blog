@@ -17,7 +17,8 @@ const {
   showSinglePost,
   showEditScreen,
   edit,
-  deletePost
+  deletePost,
+  search
 } = postController
 
 // user related routes
@@ -37,5 +38,6 @@ router.get('/post/:postId/edit', requireLogin, showEditScreen)
 router.get('/post/:postId', showSinglePost)
 router.post('/post/:postId/edit', requireLogin, edit)
 router.post('/post/:postId/delete', requireLogin, deletePost)
+router.post('/search', search)
 
 module.exports = router
