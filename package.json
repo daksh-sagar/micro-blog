@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon db"
+    "dev:windows": "start nodemon db --ignore frontend-js --ignore public/ && start webpack --watch",
+    "dev:unix": "nodemon db --ignore frontend-js --ignore public/ & webpack --watch"
   },
   "keywords": [],
   "author": "daksh-sagar <dakshsagar1997@gmail.com>",
@@ -30,8 +31,10 @@
     "validator": "^11.1.0"
   },
   "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "babel-loader": "^8.0.6",
     "eslint": "^6.0.1",
-    "nodemon": "^1.19.1",
     "eslint-config-airbnb": "^17.1.1",
     "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.18.0",
@@ -39,6 +42,9 @@
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-react": "^7.14.2",
-    "prettier": "^1.18.2"
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7"
   }
 }
