@@ -121,8 +121,27 @@ exports.search = async (req, res) => {
   try {
     const results = await Post.aggregate([
       { $match: { $text: { $search: searchTerm } } },
-      { $sort: { score: { $meta: 'textScore' } } }
+      { $sort: { score: { $meta: 'textScore' } } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'author',
+          foreignField: '_id',
+          as: 'authorDocument'
+        }
+      },
+      {
+        $project: {
+          title: 1,
+          body: 1,
+          createdDate: 1,
+          author: {
+            $arrayElemAt: ['$authorDocument', 0]
+          }
+        }
+      }
     ])
+    console.log(results[0])
     return res.status(200).json(results)
   } catch (error) {
     res.status(500).send('Something went wrong')
