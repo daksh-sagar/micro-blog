@@ -123,7 +123,8 @@ exports.showUserProfile = async (req, res) => {
     const posts = await Post.find({ author: user.id }).sort({ createdDate: -1 })
     res.render('profile', {
       profileUsername: user.username,
-      posts
+      posts,
+      success: req.flash('success')
     })
   } catch (error) {
     res.render(404)

@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const userController = require('./controllers/userController')
 const postController = require('./controllers/postController')
+const followController = require('./controllers/followController')
 
 const {
   home,
@@ -21,6 +22,8 @@ const {
   search
 } = postController
 
+const { addFollow } = followController
+
 // user related routes
 router.get('/', home)
 router.post('/register', register)
@@ -39,5 +42,8 @@ router.get('/post/:postId', showSinglePost)
 router.post('/post/:postId/edit', requireLogin, edit)
 router.post('/post/:postId/delete', requireLogin, deletePost)
 router.post('/search', search)
+
+// follow related routes
+router.post('/addFollow/:username', requireLogin, addFollow)
 
 module.exports = router

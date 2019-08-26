@@ -1,13 +1,20 @@
 <%- include('includes/header') %>
 
 <div class="container py-md-5 container--narrow">
+  <% success.forEach((message) => { %>
+  <div class="alert alert-success text-center"><%= message %></div>
+  <% }) %>
   <h2>
     <img
       class="avatar-small"
       src="https://gravatar.com/avatar/b9408a09298632b5151200f3449434ef?s=128"
     />
     <%= profileUsername %>
-    <form class="ml-2 d-inline" action="#" method="POST">
+    <form
+      class="ml-2 d-inline"
+      action="/addFollow/<%= profileUsername %>"
+      method="POST"
+    >
       <button class="btn btn-primary btn-sm">
         Follow <i class="fas fa-user-plus"></i>
       </button>
@@ -16,7 +23,9 @@
   </h2>
 
   <div class="profile-nav nav nav-tabs pt-2 mb-4">
-    <a href="#" class="profile-nav-link nav-item nav-link active">Posts: 3</a>
+    <a href="#" class="profile-nav-link nav-item nav-link active"
+      >Posts: <%= posts.length %></a
+    >
     <a href="#" class="profile-nav-link nav-item nav-link ">Followers: 3</a>
     <a href="#" class="profile-nav-link nav-item nav-link ">Following: 2</a>
   </div>
