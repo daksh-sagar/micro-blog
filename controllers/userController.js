@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken')
 const User = require('../models/User')
 const Post = require('../models/Post')
+const Follow = require('../models/Follow')
 const sendEmail = require('../utils/sendEmail')
 
 const { formatValidationErrors } = require('../utils/index')
@@ -124,9 +125,31 @@ exports.showUserProfile = async (req, res) => {
     res.render('profile', {
       profileUsername: user.username,
       posts,
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile,
       success: req.flash('success')
     })
   } catch (error) {
     res.render(404)
   }
+}
+
+exports.sharedProfileData = async (req, res, next) => {
+  let isFollowing = false
+  let isVisitorsProfile = false
+
+  if (req.params.username === req.session.user.username) {
+    isVisitorsProfile = true
+  }
+
+  if (req.session.user) {
+    isFollowing = await Follow.isVisitorFollowing(
+      req.params.username,
+      req.session.user.id
+    )
+  }
+
+  req.isFollowing = isFollowing
+  req.isVisitorsProfile = isVisitorsProfile
+  next()
 }

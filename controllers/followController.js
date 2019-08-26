@@ -5,6 +5,19 @@ exports.addFollow = async (req, res) => {
     await Follow.follow(req.params.username, req.session.user.id)
     req.flash('success', `You are now following ${req.params.username}`)
     await req.session.save()
+    res.redirect(`/profile/${req.params.username}`)
+  } catch (error) {
+    req.flash('errors', error.message)
+    await req.session.save()
+    res.redirect(`/`)
+  }
+}
+
+exports.removeFollow = async (req, res) => {
+  try {
+    await Follow.unFollow(req.params.username, req.session.user.id)
+    req.flash('success', `You have stopped following ${req.params.username}`)
+    await req.session.save()
 
     res.redirect(`/profile/${req.params.username}`)
   } catch (error) {

@@ -10,7 +10,8 @@ const {
   requireLogin,
   logout,
   confirmEmail,
-  showUserProfile
+  showUserProfile,
+  sharedProfileData
 } = userController
 const {
   showCreateScreen,
@@ -22,7 +23,7 @@ const {
   search
 } = postController
 
-const { addFollow } = followController
+const { addFollow, removeFollow } = followController
 
 // user related routes
 router.get('/', home)
@@ -32,7 +33,7 @@ router.post('/logout', logout)
 router.get('/confirm-email/:userId/:token', confirmEmail)
 
 // profile related routes
-router.get('/profile/:username', showUserProfile)
+router.get('/profile/:username', sharedProfileData, showUserProfile)
 
 // post related routes
 router.get('/create-post', requireLogin, showCreateScreen)
@@ -45,5 +46,6 @@ router.post('/search', search)
 
 // follow related routes
 router.post('/addFollow/:username', requireLogin, addFollow)
+router.post('/removeFollow/:username', requireLogin, removeFollow)
 
 module.exports = router
