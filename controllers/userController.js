@@ -153,3 +153,27 @@ exports.sharedProfileData = async (req, res, next) => {
   req.isVisitorsProfile = isVisitorsProfile
   next()
 }
+
+exports.showUserFollowers = async (req, res) => {
+  try {
+    const user = await User.findUserByUsername(req.params.username)
+    const followers = await Follow.find({
+      followed: user.id // the user's whose profile is being visited, find his followers
+    }).populate({
+      path: 'author', // the user who followed
+      select: 'username'
+    })
+
+    console.log(followers)
+
+    res.render('profile-followers', {
+      profileUsername: user.username,
+      followers,
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile,
+      success: req.flash('success')
+    })
+  } catch (error) {
+    res.render('404')
+  }
+}
