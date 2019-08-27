@@ -118,22 +118,6 @@ exports.requireLogin = async (req, res, next) => {
   }
 }
 
-exports.showUserProfile = async (req, res) => {
-  try {
-    const user = await User.findUserByUsername(req.params.username)
-    const posts = await Post.find({ author: user.id }).sort({ createdDate: -1 })
-    res.render('profile', {
-      profileUsername: user.username,
-      posts,
-      isFollowing: req.isFollowing,
-      isVisitorsProfile: req.isVisitorsProfile,
-      success: req.flash('success')
-    })
-  } catch (error) {
-    res.render(404)
-  }
-}
-
 exports.sharedProfileData = async (req, res, next) => {
   let isFollowing = false
   let isVisitorsProfile = false
@@ -151,7 +135,49 @@ exports.sharedProfileData = async (req, res, next) => {
 
   req.isFollowing = isFollowing
   req.isVisitorsProfile = isVisitorsProfile
+
+  // retrieve posts, followers and following count
+  const user = await User.findUserByUsername(req.params.username)
+  const postCountPromise = Post.countDocuments({ author: user.id })
+  const followerCountPromise = Follow.countDocuments({ followed: user.id })
+  const followingCountPromise = Follow.countDocuments({ author: user.id })
+
+  const [postCount, followerCount, followingCount] = await Promise.all([
+    postCountPromise,
+    followerCountPromise,
+    followingCountPromise
+  ])
+
+  req.authorId = user.id
+  req.username = user.username
+  req.postCount = postCount
+  req.followerCount = followerCount
+  req.followingCount = followingCount
+
   next()
+}
+
+exports.showUserProfile = async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.authorId }).sort({
+      createdDate: -1
+    })
+    res.render('profile', {
+      profileUsername: req.username,
+      currentPage: 'posts',
+      posts,
+      counts: {
+        postCount: req.postCount,
+        followerCount: req.followerCount,
+        followingCount: req.followingCount
+      },
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile,
+      success: req.flash('success')
+    })
+  } catch (error) {
+    res.render(404)
+  }
 }
 
 exports.showUserFollowers = async (req, res) => {
@@ -168,7 +194,41 @@ exports.showUserFollowers = async (req, res) => {
 
     res.render('profile-followers', {
       profileUsername: user.username,
+      currentPage: 'followers',
       followers,
+      counts: {
+        postCount: req.postCount,
+        followerCount: req.followerCount,
+        followingCount: req.followingCount
+      },
+      isFollowing: req.isFollowing,
+      isVisitorsProfile: req.isVisitorsProfile,
+      success: req.flash('success')
+    })
+  } catch (error) {
+    res.render('404')
+  }
+}
+
+exports.showUserFollowing = async (req, res) => {
+  try {
+    const user = await User.findUserByUsername(req.params.username)
+    const following = await Follow.find({
+      author: user.id // the user's whose profile is being visited, find the guys he is following
+    }).populate({
+      path: 'followed', // the user who is being followed
+      select: 'username'
+    })
+
+    res.render('profile-following', {
+      profileUsername: user.username,
+      currentPage: 'following',
+      following,
+      counts: {
+        postCount: req.postCount,
+        followerCount: req.followerCount,
+        followingCount: req.followingCount
+      },
       isFollowing: req.isFollowing,
       isVisitorsProfile: req.isVisitorsProfile,
       success: req.flash('success')

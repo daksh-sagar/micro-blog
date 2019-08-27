@@ -12,7 +12,8 @@ const {
   confirmEmail,
   showUserProfile,
   sharedProfileData,
-  showUserFollowers
+  showUserFollowers,
+  showUserFollowing
 } = userController
 const {
   showCreateScreen,
@@ -36,7 +37,7 @@ router.get('/confirm-email/:userId/:token', confirmEmail)
 // profile related routes
 router.get('/profile/:username', sharedProfileData, showUserProfile)
 router.get('/profile/:username/followers', sharedProfileData, showUserFollowers)
-// router.get('/profile/:username/following', sharedProfileData, showUserFollowing)
+router.get('/profile/:username/following', sharedProfileData, showUserFollowing)
 
 // post related routes
 router.get('/create-post', requireLogin, showCreateScreen)
