@@ -141,7 +141,6 @@ exports.search = async (req, res) => {
         }
       }
     ])
-    console.log(results[0])
     return res.status(200).json(results)
   } catch (error) {
     res.status(500).send('Something went wrong')

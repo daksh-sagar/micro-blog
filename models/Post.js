@@ -52,6 +52,39 @@ postSchema.statics.findSinglePostById = async function(postId) {
   return post
 }
 
+postSchema.statics.getFeed = async function(userID) {
+  const followedUsers = await mongoose.models.Follow.find({
+    author: userID // the one who follows a user
+  })
+
+  const followedUsersIds = followedUsers.map(doc => doc.followed)
+
+  const posts = await mongoose.models.Post.aggregate([
+    { $match: { author: { $in: followedUsersIds } } },
+    { $sort: { createdDate: -1 } },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'author',
+        foreignField: '_id',
+        as: 'authorDocument'
+      }
+    },
+    {
+      $project: {
+        title: 1,
+        body: 1,
+        createdDate: 1,
+        authorUsername: {
+          $arrayElemAt: ['$authorDocument.username', 0]
+        }
+      }
+    }
+  ])
+
+  return posts
+}
+
 postSchema.index(
   {
     title: 'text',

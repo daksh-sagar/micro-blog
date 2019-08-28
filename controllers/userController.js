@@ -14,9 +14,10 @@ const generateConfirmationLink = userId => {
   return `http://localhost:5000/confirm-email/${userId}/${token}`
 }
 
-exports.home = (req, res) => {
+exports.home = async (req, res) => {
   if (req.session.user) {
-    res.render('home-dashboard', { username: req.session.user.username })
+    const posts = await Post.getFeed(req.session.user.id)
+    res.render('home-dashboard', { username: req.session.user.username, posts })
   } else {
     res.render('home-guest', {
       regSuccess: req.flash('regSuccess'),
