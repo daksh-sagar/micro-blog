@@ -36,7 +36,7 @@ export default class Chat {
             ${this.chatField.value}
           </div>
         </div>
-        <img class="chat-avatar avatar-tiny" src="https://gravatar.com/avatar/f64fc44c03a8a7eb1d52502950879659?s=128">
+        <img class="chat-avatar avatar-tiny" src="${this.avatar}">
       </div>
     `
     )
@@ -63,6 +63,7 @@ export default class Chat {
     this.socket = io()
     this.socket.on('welcome', data => {
       this.username = data.username
+      this.avatar = data.avatar
     })
     this.socket.on('chatMessageFromServer', data => {
       this.displayMessageFromServer(data)
@@ -73,7 +74,7 @@ export default class Chat {
     this.chatLog.insertAdjacentHTML(
       'beforeend',
       `<div class="chat-other">
-    <a href="/profile/${data.username}"><img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128"></a>
+    <a href="/profile/${data.username}"><img class="avatar-tiny" src="${data.avatar}"></a>
     <div class="chat-message"><div class="chat-message-inner">
       <a href="/profile/${data.username}"><strong>${data.username}:</strong></a>
       ${data.message}

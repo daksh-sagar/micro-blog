@@ -53,14 +53,15 @@ io.use((socket, next) => {
 io.on('connection', socket => {
   if (socket.request.session.user) {
     const { user } = socket.request.session
-    socket.emit('welcome', { username: user.username })
+    socket.emit('welcome', { username: user.username, avatar: user.avatar })
     socket.on('chatMessageFromBrowser', data => {
       socket.broadcast.emit('chatMessageFromServer', {
         message: sanitizeHTML(data.message, {
           allowedTags: [],
           allowedAttributes: {}
         }),
-        username: user.username
+        username: user.username,
+        avatar: user.avatar
       })
     })
   }

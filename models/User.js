@@ -8,10 +8,22 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Username is required'],
     lowercase: true,
     trim: true,
+    unique: true,
     minlength: [3, 'Username must contain atleast 3 characters'],
     validate: [
-      isAlphanumeric,
-      'Username can only contain alphabets and numbers'
+      {
+        validator: value => isAlphanumeric(value),
+        msg: 'Username can only contain alphabets and numbers'
+      },
+      {
+        validator: async value => {
+          const usernameCount = await mongoose.models.User.countDocuments({
+            username: value
+          })
+          return !usernameCount
+        },
+        msg: 'Username address already taken'
+      }
     ]
   },
   email: {
@@ -40,6 +52,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [8, 'Password must contain atleast 8 characters']
+  },
+  avatar: {
+    type: String,
+    required: true
   },
   isConfirmed: {
     type: Boolean,

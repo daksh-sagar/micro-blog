@@ -64,7 +64,7 @@ export default class Search {
           return `<a href="/post/${
             post._id
           }" class="list-group-item list-group-item-action">
-        <img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128"> <strong>${
+        <img class="avatar-tiny" src="<%= post.author.avatar %>"> <strong>${
           post.title
         }</strong>
         <span class="text-muted small">by ${

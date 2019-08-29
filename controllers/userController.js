@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken')
+const gravatar = require('gravatar')
 const User = require('../models/User')
 const Post = require('../models/Post')
 const Follow = require('../models/Follow')
@@ -30,11 +31,17 @@ exports.home = async (req, res) => {
 
 exports.register = async (req, res) => {
   const { username, email, password } = req.body
+  const avatar = gravatar.url(email, {
+    s: '200',
+    r: 'pg',
+    d: 'mm'
+  })
   try {
     const user = await User.create({
       username,
       email,
-      password
+      password,
+      avatar
     })
 
     const confirmationLink = generateConfirmationLink(user.id)
@@ -70,7 +77,8 @@ exports.login = async (req, res) => {
     const user = await User.findUserByCredentials(email, password)
     req.session.user = {
       id: user.id,
-      username: user.username
+      username: user.username,
+      avatar: user.avatar
     }
     await req.session.save()
     res.redirect('/')
@@ -151,6 +159,7 @@ exports.sharedProfileData = async (req, res, next) => {
 
   req.authorId = user.id
   req.username = user.username
+  req.avatar = user.avatar
   req.postCount = postCount
   req.followerCount = followerCount
   req.followingCount = followingCount
@@ -166,6 +175,7 @@ exports.showUserProfile = async (req, res) => {
     res.render('profile', {
       title: `${req.username}'s Profile`,
       profileUsername: req.username,
+      profileAvatar: req.avatar,
       currentPage: 'posts',
       posts,
       counts: {
@@ -189,13 +199,14 @@ exports.showUserFollowers = async (req, res) => {
       followed: user.id // the user's whose profile is being visited, find his followers
     }).populate({
       path: 'author', // the user who followed
-      select: 'username'
+      select: 'username avatar'
     })
 
     console.log(followers)
 
     res.render('profile-followers', {
       profileUsername: user.username,
+      profileAvatar: user.avatar,
       currentPage: 'followers',
       followers,
       counts: {
@@ -219,11 +230,12 @@ exports.showUserFollowing = async (req, res) => {
       author: user.id // the user's whose profile is being visited, find the guys he is following
     }).populate({
       path: 'followed', // the user who is being followed
-      select: 'username'
+      select: 'username avatar'
     })
 
     res.render('profile-following', {
       profileUsername: user.username,
+      profileAvatar: user.avatar,
       currentPage: 'following',
       following,
       counts: {

@@ -43,7 +43,7 @@ postSchema.statics.findSinglePostById = async function(postId) {
 
   const post = await mongoose.models.Post.findById(postId).populate({
     path: 'author',
-    select: 'username'
+    select: 'username avatar'
   })
   if (!post) {
     throw new Error('Post not found ')
@@ -77,6 +77,9 @@ postSchema.statics.getFeed = async function(userID) {
         createdDate: 1,
         authorUsername: {
           $arrayElemAt: ['$authorDocument.username', 0]
+        },
+        authorAvatar: {
+          $arrayElemAt: ['$authorDocument.avatar', 0]
         }
       }
     }
