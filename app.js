@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const flash = require('connect-flash')
 const markdown = require('marked')
 const sanitizeHTML = require('sanitize-html')
+const csrf = require('csurf')
 
 const router = require('./router')
 
@@ -40,7 +41,26 @@ app.use(express.static('public'))
 app.set('views', 'views')
 app.set('view engine', 'ejs')
 
+app.use(csrf())
+
+app.use((req, res, next) => {
+  res.locals.csrfToken = req.csrfToken()
+  next()
+})
+
 app.use(router)
+
+app.use(async (err, req, res, next) => {
+  if (err) {
+    if (err.code === 'EBADCSRFTOKEN') {
+      req.flash('errors', 'Cross site request forgery detected')
+      await req.session.save()
+      res.redirect('/')
+    } else {
+      res.render('404')
+    }
+  }
+})
 
 const server = http.createServer(app)
 
