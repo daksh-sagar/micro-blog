@@ -164,6 +164,7 @@ exports.showUserProfile = async (req, res) => {
       createdDate: -1
     })
     res.render('profile', {
+      title: `${req.username}'s Profile`,
       profileUsername: req.username,
       currentPage: 'posts',
       posts,

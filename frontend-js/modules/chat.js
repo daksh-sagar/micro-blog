@@ -5,6 +5,9 @@ export default class Chat {
     this.openedYet = false
     this.openIcon = document.querySelector('.header-chat-icon')
     this.closeIcon = document.querySelector('.chat-title-bar-close')
+    this.chatField = document.querySelector('#chatField')
+    this.chatForm = document.querySelector('#chatForm')
+    this.chatLog = document.querySelector('#chat')
     this.events()
   }
 
@@ -12,9 +15,35 @@ export default class Chat {
   events() {
     this.openIcon.addEventListener('click', () => this.showChat())
     this.closeIcon.addEventListener('click', () => this.hideChat())
+    this.chatForm.addEventListener('submit', e => {
+      e.preventDefault()
+      this.sendMessageToServer()
+    })
   }
 
   // Methods
+
+  sendMessageToServer() {
+    this.socket.emit('chatMessageFromBrowser', {
+      message: this.chatField.value
+    })
+    this.chatLog.insertAdjacentHTML(
+      'beforeend',
+      `
+    <div class="chat-self">
+        <div class="chat-message">
+          <div class="chat-message-inner">
+            ${this.chatField.value}
+          </div>
+        </div>
+        <img class="chat-avatar avatar-tiny" src="https://gravatar.com/avatar/f64fc44c03a8a7eb1d52502950879659?s=128">
+      </div>
+    `
+    )
+    this.chatLog.scrollTop = this.chatLog.scrollHeight
+    this.chatField.value = ''
+    this.chatField.focus()
+  }
 
   showChat() {
     if (!this.openedYet) {
@@ -23,6 +52,7 @@ export default class Chat {
 
     this.openedYet = true
     this.chatWrapper.classList.add('chat--visible')
+    this.chatField.focus()
   }
 
   hideChat() {
@@ -30,7 +60,27 @@ export default class Chat {
   }
 
   openConnection() {
-    alert('Opening a connection')
+    this.socket = io()
+    this.socket.on('welcome', data => {
+      this.username = data.username
+    })
+    this.socket.on('chatMessageFromServer', data => {
+      this.displayMessageFromServer(data)
+    })
+  }
+
+  displayMessageFromServer(data) {
+    this.chatLog.insertAdjacentHTML(
+      'beforeend',
+      `<div class="chat-other">
+    <a href="/profile/${data.username}"><img class="avatar-tiny" src="https://gravatar.com/avatar/b9216295c1e3931655bae6574ac0e4c2?s=128"></a>
+    <div class="chat-message"><div class="chat-message-inner">
+      <a href="/profile/${data.username}"><strong>${data.username}:</strong></a>
+      ${data.message}
+    </div></div>
+  </div>`
+    )
+    this.chatLog.scrollTop = this.chatLog.scrollHeight
   }
 
   injectHTML() {

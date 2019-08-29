@@ -36,7 +36,7 @@ exports.showSinglePost = async (req, res) => {
 
   try {
     const post = await Post.findSinglePostById(postId)
-    res.render('post', { post })
+    res.render('post', { post, title: post.title })
   } catch (error) {
     res.status(404).render('404')
   }
