@@ -29,7 +29,7 @@
     "marked": "^0.7.0",
     "mongoose": "^5.7.5",
     "nodemailer": "^6.3.0",
-    "sanitize-html": "^1.20.1",
+    "sanitize-html": "^2.3.2",
     "socket.io": "^2.2.0",
     "validator": "^11.1.0"
   },
